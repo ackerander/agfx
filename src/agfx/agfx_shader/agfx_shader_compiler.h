@@ -7,6 +7,14 @@
 #pragma once
 
 #include <stdint.h>
+#include <stdlib.h>
+
+/// @brief Allocation function signature for agfxDeviceCreate.
+/// @param size The number of bytes to allocate.
+/// @param userData The agfxDeviceCreateInfo::userData pointer, passed through verbatim.
+typedef void* (*agfxAllocate)(uint64_t size, void* userData);
+
+inline void* defaultAlloc(uint64_t size, void* userData) { return malloc(size); }
 
 typedef enum agfxShaderStage {
     AGFX_SHADER_STAGE_VERTEX,
@@ -17,6 +25,11 @@ typedef enum agfxShaderStage {
 } agfxShaderStage;
 
 typedef struct agfxShaderCompilerOptions {
+    /// @brief The allocation function to use for device memory allocations.
+    agfxAllocate allocate;
+    /// @brief Optional user pointer handed back verbatim to allocate
+    ///        Leave nullptr if unused.
+    void* userData;
     agfxShaderStage stage;
     char entryPoint[256];
 
